@@ -2,18 +2,26 @@ import React from "react";
 import AffiliateProductCard from "./AffiliateProductCard";
 import ProductCardSkeleton from "./ProductCardSkeleton";
 import { AffiliateProduct } from "@/services/jewelleryService";
+import EmptyState from "@/components/ui/EmptyState";
+import { Search, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// 1. Ensure 'isLoading: boolean;' is defined in this interface
 interface ProductGridProps {
   products?: AffiliateProduct[];
-  isLoading: boolean; // <-- This line is likely missing or incorrect in your file
+  isLoading: boolean;
   onProductClick: (url?: string | null) => void;
+  emptyTitle?: string;
+  emptyDescription?: string;
+  onClearSearch?: () => void;
 }
 
 const ProductGrid: React.FC<ProductGridProps> = ({
   products = [],
-  isLoading, // 2. Ensure 'isLoading' is destructured from the props here
+  isLoading,
   onProductClick,
+  emptyTitle = "No products found",
+  emptyDescription = "Try a broader search or browse another collection.",
+  onClearSearch,
 }) => {
   // 3. This 'if' block handles the loading state
   if (isLoading) {
@@ -28,8 +36,19 @@ const ProductGrid: React.FC<ProductGridProps> = ({
 
   if (products.length === 0) {
     return (
-      <div className="text-center py-10 bg-gray-50 rounded-lg col-span-full">
-        <p className="text-gray-500">No products found matching your search.</p>
+      <div className="col-span-full">
+        <EmptyState
+          icon={Search}
+          title={emptyTitle}
+          description={emptyDescription}
+          action={onClearSearch ? (
+            <Button variant="outline" onClick={onClearSearch}>
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Clear search
+            </Button>
+          ) : undefined}
+          className="bg-white"
+        />
       </div>
     );
   }

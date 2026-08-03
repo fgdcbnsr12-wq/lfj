@@ -24,6 +24,7 @@ class ContactFormController extends Controller
                 'email' => $validated['email'],
                 'subject' => $validated['subject'],
                 'message' => $validated['message'],
+                'status' => 'new',
                 'ip_address' => $request->ip(),
             ]);
 
@@ -33,7 +34,7 @@ class ContactFormController extends Controller
             // Mail::to('your-admin-email@example.com')->send(new ContactFormSubmitted($submission));
 
             // Return a success response
-            return response()->json(['message' => 'Message sent successfully! '], 201);
+            return response()->json(['message' => 'Message sent successfully. We will follow up shortly.'], 201);
 
         } catch (\Exception $e) {
             Log::error('Contact form submission failed: ' . $e->getMessage());

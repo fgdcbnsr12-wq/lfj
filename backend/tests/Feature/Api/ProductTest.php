@@ -134,6 +134,30 @@ test('search endpoint validates input', function () {
     $response->assertStatus(200);
 });
 
+test('shop search prioritizes direct product-name matches before note matches', function () {
+    $olderMatch = AffiliateProduct::factory()->create([
+        'status' => 'active',
+        'product_name_snapshot' => 'Diamond Gold Ring',
+        'your_notes' => 'This product is gold and matches the search term.',
+        'item_type' => 'ring',
+        'updated_at' => now()->subDay(),
+    ]);
+
+    $newerNoteMatch = AffiliateProduct::factory()->create([
+        'status' => 'active',
+        'product_name_snapshot' => 'Necklace',
+        'your_notes' => 'Gold is the main search term in the listing notes.',
+        'item_type' => 'necklace',
+        'updated_at' => now(),
+    ]);
+
+    $response = $this->getJson('/api/products/search?query=gold&per_page=5');
+
+    $response->assertStatus(200)
+        ->assertJsonPath('data.0.id', $olderMatch->id)
+        ->assertJsonPath('data.1.id', $newerNoteMatch->id);
+});
+
 test('security headers are present', function () {
     $response = $this->getJson('/api/health');
 

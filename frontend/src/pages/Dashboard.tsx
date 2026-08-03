@@ -1,24 +1,24 @@
-﻿import React from 'react';
+﻿import React, { useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer, 
-  LineChart, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
   Line,
   PieChart,
   Pie,
   Cell
 } from 'recharts';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { FileText, Users, Eye, Activity, LogOut, Home, Settings, Heart } from 'lucide-react';
+import { FileText, Users, Eye, Activity, LogOut, Home, Settings, Heart, Sparkles, ArrowRight } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,10 +29,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { usePosts } from '@/hooks/usePosts';
 import { useEvents } from '@/hooks/useEvents';
+import { useWishlist } from '@/hooks/useWishlist';
+import { useContentContinuation } from '@/hooks/useContentContinuation';
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const { items: savedWishlistItems } = useWishlist();
+  const { history } = useContentContinuation();
   const { data: postsData } = usePosts({ perPage: 5 });
   const { data: eventsData } = useEvents({ perPage: 5 });
 
@@ -65,11 +69,40 @@ const Dashboard = () => {
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
+  const recommendationCards = useMemo(() => {
+    const fromHistory = history.slice(0, 3);
+    const fallback = [
+      {
+        title: 'Trending wedding jewelry',
+        path: '/shop',
+        subtitle: 'See our latest statement pieces',
+      },
+      {
+        title: 'Editor picks for gifting',
+        path: '/blog',
+        subtitle: 'Curated giftable styling stories',
+      },
+      {
+        title: 'Upcoming showcase nights',
+        path: '/events',
+        subtitle: 'Be first to book your seat',
+      },
+    ];
+
+    return fromHistory.length > 0
+      ? fromHistory.map((item) => ({
+          title: item.title,
+          path: item.path,
+          subtitle: item.subtitle || 'Continue where you left off',
+        }))
+      : fallback;
+  }, [history]);
+
   const statsCards = [
     {
       title: 'Wishlist Items',
-      value: '24',
-      change: '+3 this week',
+      value: String(savedWishlistItems.length),
+      change: savedWishlistItems.length > 0 ? 'Saved for later' : 'No saves yet',
       positive: true,
       icon: Heart,
       color: 'text-pink-500'
@@ -189,6 +222,29 @@ const Dashboard = () => {
             );
           })}
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Personalized recommendations
+            </CardTitle>
+            <CardDescription>Based on what you have viewed recently and saved for later.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-4 md:grid-cols-3">
+              {recommendationCards.map((item) => (
+                <Link key={item.title} to={item.path} className="rounded-xl border p-4 hover:bg-muted/40 transition-colors">
+                  <p className="font-semibold text-sm mb-1">{item.title}</p>
+                  <p className="text-xs text-muted-foreground mb-3">{item.subtitle}</p>
+                  <span className="inline-flex items-center text-xs text-primary">
+                    Open now <ArrowRight className="ml-1 h-3 w-3" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Charts and Activity Tabs */}
         <Tabs defaultValue="posts" className="w-full">

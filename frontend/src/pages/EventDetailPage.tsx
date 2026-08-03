@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useEvent, useEvents } from "@/hooks/useEvents";
+import { useContentContinuation } from '@/hooks/useContentContinuation';
 import SeoHead from "@/components/seo/SeoHead";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 
@@ -20,8 +21,25 @@ import { parseISO, isPast } from "date-fns";
 
 const EventDetailPage: React.FC = () => {
   const { eventSlug } = useParams<{ eventSlug: string }>();
+  const { markVisited } = useContentContinuation();
 
   const { data: event, isLoading, isError, error } = useEvent(eventSlug);
+
+  useEffect(() => {
+    if (!event) {
+      return;
+    }
+
+    markVisited({
+      kind: 'event',
+      title: event.title,
+      path: `/events/${event.slug}`,
+      slug: event.slug,
+      subtitle: event.location_name || 'Explore this event',
+      imageUrl: event.featured_image_url || null,
+      visitedAt: new Date().toISOString(),
+    });
+  }, [event, markVisited]);
   const { data: relatedEvents, isLoading: areRelatedLoading } = useEvents(
     { limit: 3, exclude: eventSlug },
     { enabled: !!event }

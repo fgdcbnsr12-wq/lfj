@@ -18,6 +18,7 @@ class ContactFormRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'subject' => ['required', 'string', 'min:5', 'max:255'],
             'message' => ['required', 'string', 'min:10', 'max:5000'],
+            'website' => ['nullable', 'prohibited'],
         ];
     }
 
@@ -36,6 +37,7 @@ class ContactFormRequest extends FormRequest
             'message.required' => 'Message is required.',
             'message.min' => 'Message must be at least 10 characters long.',
             'message.max' => 'Message must not exceed 5000 characters.',
+            'website.prohibited' => 'This field is reserved for spam protection.',
         ];
     }
 }

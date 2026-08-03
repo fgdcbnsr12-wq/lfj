@@ -28,7 +28,7 @@ class PostResource extends JsonResource
             'author' => $this->user ? new UserResource($this->user) : null,
             'categories' => CategoryResource::collection($this->categories),
             'tags' => TagResource::collection($this->tags),
-            'seo' => [],
+            'seo' => app(SeoService::class)->forPost($this->resource),
             'created_at_human' => $this->created_at->diffForHumans(),
             'updated_at_iso' => $this->updated_at->toIso8601String(),
         ];

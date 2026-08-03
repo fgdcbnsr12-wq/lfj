@@ -5,6 +5,8 @@ import { Card, CardContent, CardFooter, CardTitle } from "@/components/ui/card";
 import ProductImage from "@/components/ui/ProductImage";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
+import { useWishlist } from '@/hooks/useWishlist';
+import { useContentContinuation } from '@/hooks/useContentContinuation';
 import { ExternalLinkIcon, Heart, Star } from "lucide-react";
 
 interface AffiliateProductCardProps {
@@ -17,8 +19,10 @@ const AffiliateProductCard: React.FC<AffiliateProductCardProps> = ({
   product,
   onClick,
 }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { markVisited } = useContentContinuation();
   const [imageLoaded, setImageLoaded] = useState(false);
+  const isWishlisted = isInWishlist(product.id);
 
   const randomRating = useMemo(() => {
     return product.rating || parseFloat((4.0 + Math.random()).toFixed(1));
@@ -30,7 +34,18 @@ const AffiliateProductCard: React.FC<AffiliateProductCardProps> = ({
     // The entire card is clickable, triggering the main onClick from the parent
     <Card
       className="card-elegant group h-full flex flex-col cursor-pointer"
-      onClick={onClick}
+      onClick={() => {
+        markVisited({
+          kind: 'product',
+          title: product.name,
+          path: product.affiliate_url || '/shop',
+          slug: product.asin || String(product.id),
+          subtitle: product.notes || 'Continue exploring this product',
+          imageUrl: product.image_url || null,
+          visitedAt: new Date().toISOString(),
+        });
+        onClick?.();
+      }}
     >
       <div className="absolute top-3 right-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
         <Button
@@ -38,8 +53,12 @@ const AffiliateProductCard: React.FC<AffiliateProductCardProps> = ({
           size="icon"
           className="h-8 w-8 bg-background/80 backdrop-blur-sm hover:bg-primary hover:text-primary-foreground"
           onClick={(e) => {
-            e.stopPropagation(); // Prevents card's main onClick
-            setIsWishlisted(!isWishlisted);
+            e.stopPropagation();
+            toggleWishlist(product.id, {
+              name: product.name,
+              image_url: product.image_url || null,
+              affiliate_url: product.affiliate_url,
+            });
           }}
         >
           <Heart

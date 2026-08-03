@@ -216,6 +216,8 @@
   /* Enhanced Content Styling for Blog & Event Pages */
   .blog-content, .event-content {
     @apply max-w-none;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     
     /* Enhanced Paragraphs */
     p {
@@ -269,6 +271,35 @@
       margin-bottom: 0.6em;
       color: hsl(var(--foreground));
       font-family: 'Playfair Display', serif;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+      margin: 1.5em 0;
+    }
+
+    @media (max-width: 640px) {
+      p {
+        font-size: 1rem;
+        text-align: left;
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin-top: 2rem;
+      }
+
+      h2 {
+        font-size: 1.6rem;
+        margin-top: 1.7rem;
+      }
+
+      h3 {
+        font-size: 1.3rem;
+      }
     }
 
     h5 {

@@ -34,7 +34,7 @@ class CategoryResource extends JsonResource
             // Remove or comment out the old posts_count
             // 'posts_count' => $this->whenCounted('posts'),
 
-            'seo' => [], // Temporarily disabled: app(SeoService::class)->forCategory($this->resource),
+            'seo' => app(SeoService::class)->forCategory($this->resource),
         ];
     }
 }

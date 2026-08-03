@@ -24,7 +24,28 @@ const FutureFrontiers: React.FC = () => {
         <meta property="og:title" content="Future Frontiers: Gold's Role in Tomorrow's Technology" />
         <meta property="og:description" content="From Mars missions to quantum computers, discover how gold will continue to push the boundaries of human achievement." />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content="/images/placeholder.svg" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? `${window.location.origin}/future-frontiers` : '/future-frontiers'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Future Frontiers of Gold | Space & Quantum Technology | The Luster" />
+        <meta name="twitter:description" content="Explore gold's role in future technologies across quantum systems, space exploration, and renewable energy." />
+        <meta name="twitter:image" content="/images/placeholder.svg" />
         <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/future-frontiers` : '/future-frontiers'} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: 'Future Frontiers of Gold',
+            description: 'Explore gold\'s role in future technologies: space exploration, quantum computing, renewable energy, and medical breakthroughs. Discover how gold will shape tomorrow.',
+            image: '/images/placeholder.svg',
+            author: { '@type': 'Organization', name: 'The Luster' },
+            publisher: { '@type': 'Organization', name: 'The Luster' },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': typeof window !== 'undefined' ? `${window.location.origin}/future-frontiers` : '/future-frontiers',
+            },
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-black text-white overflow-hidden">

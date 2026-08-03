@@ -24,7 +24,28 @@ const CosmicOrigins: React.FC = () => {
         <meta property="og:title" content="Cosmic Origins of Gold: From Stars to Earth" />
         <meta property="og:description" content="Journey through space and time to discover how gold was born in stellar explosions and traveled across the cosmos to reach Earth." />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content="/images/placeholder.svg" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? `${window.location.origin}/cosmic-origins` : '/cosmic-origins'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Cosmic Origins of Gold | The Birth of Elements | The Luster" />
+        <meta name="twitter:description" content="Discover how gold was forged in the hearts of dying stars and neutron star collisions billions of years ago." />
+        <meta name="twitter:image" content="/images/placeholder.svg" />
         <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/cosmic-origins` : '/cosmic-origins'} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: 'Cosmic Origins of Gold',
+            description: 'Discover how gold was forged in the hearts of dying stars and neutron star collisions billions of years ago. Explore the cosmic journey of the universe\'s most precious element.',
+            image: '/images/placeholder.svg',
+            author: { '@type': 'Organization', name: 'The Luster' },
+            publisher: { '@type': 'Organization', name: 'The Luster' },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': typeof window !== 'undefined' ? `${window.location.origin}/cosmic-origins` : '/cosmic-origins',
+            },
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white overflow-hidden">

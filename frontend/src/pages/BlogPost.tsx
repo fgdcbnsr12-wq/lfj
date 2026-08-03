@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import BlogLayout from '@/components/layout/BlogLayout';
 import { usePost, usePosts } from '@/hooks/usePosts';
+import { useContentContinuation } from '@/hooks/useContentContinuation';
 import { Post as PostType, GetPostsParams } from '@/services/postService';
 
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarDays as CalendarDaysIcon, Clock as ClockIcon, Tag as TagIcon, ArrowLeft as ArrowLeftIcon, ArrowRight as ArrowRightIcon } from 'lucide-react';
+import { CalendarDays as CalendarDaysIcon, Clock as ClockIcon, Tag as TagIcon, ArrowLeft as ArrowLeftIcon, ArrowRight as ArrowRightIcon, ArrowUp as ArrowUpIcon } from 'lucide-react';
 import PostCardSkeleton from '@/components/ui/skeletons/PostCardSkeleton';
 import { getPublicImageUrl } from '@/lib/imageUrl';
 import SeoHead from '@/components/seo/SeoHead';
@@ -55,8 +56,33 @@ const BlogPostSkeleton: React.FC = () => (
 
 const BlogPostPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { markVisited } = useContentContinuation();
+  const [showScrollToTop, setShowScrollToTop] = useState(false);
 
   const { data: post, isLoading, isError, error: postError } = usePost(slug);
+
+  useEffect(() => {
+    if (!post) {
+      return;
+    }
+
+    markVisited({
+      kind: 'blog',
+      title: post.title,
+      path: `/blog/${post.slug}`,
+      slug: post.slug,
+      subtitle: post.excerpt || 'Continue reading this story',
+      imageUrl: post.featured_image_url || null,
+      visitedAt: new Date().toISOString(),
+    });
+  }, [markVisited, post]);
+
+  useEffect(() => {
+    const onScroll = () => setShowScrollToTop(window.scrollY > 640);
+    onScroll();
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const firstCategorySlug = post?.categories?.[0]?.slug;
     const relatedParams: GetPostsParams = {
@@ -174,7 +200,7 @@ const BlogPostPage: React.FC = () => {
           </figure>
         )}
 
-        <div className="blog-content" dangerouslySetInnerHTML={{ __html: post.content_html }} />
+        <div className="blog-content break-words" dangerouslySetInnerHTML={{ __html: post.content_html }} />
 
         {post.tags?.length > 0 && (
           <div className="mt-10 pt-8 border-t border-gray-200">
@@ -231,6 +257,21 @@ const BlogPostPage: React.FC = () => {
                 <PostCardSkeleton key={i} />
               ))}
             </div>
+          </div>
+        )}
+
+        {showScrollToTop && (
+          <div className="fixed bottom-4 left-1/2 z-40 flex w-[calc(100%-1.5rem)] max-w-sm -translate-x-1/2 items-center justify-between gap-2 rounded-full border border-slate-200 bg-white/95 p-2 shadow-lg backdrop-blur md:hidden">
+            <Button asChild variant="ghost" size="sm" className="rounded-full">
+              <Link to="/blog">
+                <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                Blog
+              </Link>
+            </Button>
+            <Button variant="secondary" size="sm" className="rounded-full" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+              <ArrowUpIcon className="mr-2 h-4 w-4" />
+              Top
+            </Button>
           </div>
         )}
       </article>

@@ -26,15 +26,41 @@ const buildBreadcrumbSchema = (breadcrumbs = []) => ({
   })),
 });
 
+const toAbsoluteCanonical = (canonicalValue) => {
+  if (!canonicalValue) return typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '';
+
+  if (canonicalValue.startsWith('http')) {
+    return canonicalValue;
+  }
+
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  return `${origin}${canonicalValue}`;
+};
+
 const SeoHead = ({ seo, breadcrumbs, heroImageUrl }) => {
   const data = { ...defaultSeo, ...(seo || {}) };
   const og = { ...defaultSeo.og, ...(data.og || {}) };
   const twitter = { ...defaultSeo.twitter, ...(data.twitter || {}) };
+  const canonical = toAbsoluteCanonical(data.canonical || (typeof window !== 'undefined' ? window.location.pathname : ''));
   const schemas = Array.isArray(data.schema)
     ? data.schema
     : data.schema
     ? [data.schema]
     : [];
+
+  const finalSchemas = schemas.length
+    ? schemas
+    : [{
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        name: data.title,
+        description: data.meta_description || defaultSeo.meta_description,
+        url: canonical,
+        publisher: {
+          '@type': 'Organization',
+          name: defaultSeo.site_name,
+        },
+      }];
 
   return (
     <Helmet>
@@ -45,7 +71,7 @@ const SeoHead = ({ seo, breadcrumbs, heroImageUrl }) => {
       {data.keywords ? <meta name="keywords" content={data.keywords} /> : null}
       <meta name="robots" content={data.robots || 'index,follow'} />
       <meta name="theme-color" content={data.theme_color || defaultSeo.theme_color} />
-      <link rel="canonical" href={data.canonical} />
+      <link rel="canonical" href={canonical} />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://images.unsplash.com" />
       <link rel="preconnect" href="https://img.youtube.com" />
@@ -62,7 +88,7 @@ const SeoHead = ({ seo, breadcrumbs, heroImageUrl }) => {
       <meta property="og:description" content={og.description || data.meta_description} />
       {og.image ? <meta property="og:image" content={og.image} /> : null}
       <meta property="og:type" content={og.type || 'website'} />
-      <meta property="og:url" content={og.url || data.canonical} />
+      <meta property="og:url" content={og.url || canonical} />
       <meta property="og:site_name" content={data.site_name || defaultSeo.site_name} />
 
       <meta name="twitter:card" content={twitter.card || 'summary_large_image'} />
@@ -71,7 +97,7 @@ const SeoHead = ({ seo, breadcrumbs, heroImageUrl }) => {
       {twitter.image ? <meta name="twitter:image" content={twitter.image} /> : null}
       <meta name="twitter:site" content={data.twitter_handle || defaultSeo.twitter_handle} />
 
-      {schemas.map((schemaObject, index) => (
+      {finalSchemas.map((schemaObject, index) => (
         <script key={`schema-${index}`} type="application/ld+json">
           {JSON.stringify(schemaObject)}
         </script>

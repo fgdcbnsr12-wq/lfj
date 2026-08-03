@@ -85,6 +85,27 @@ const Trends: React.FC = () => {
         <title>Latest Jewelry Trends 2024 | Latest Fashion Jewellery</title>
         <meta name="description" content="Stay ahead with the latest jewelry trends. Discover what's hot in fashion jewelry for 2024, from celebrity picks to seasonal must-haves." />
         <meta name="keywords" content="jewelry trends 2024, fashion jewelry, trending accessories, celebrity jewelry" />
+        <meta property="og:title" content="Latest Jewelry Trends 2024 | Latest Fashion Jewellery" />
+        <meta property="og:description" content="Explore the hottest jewelry trends, seasonal inspirations, and influencer picks for 2024." />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/images/placeholder.svg" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? `${window.location.origin}/trends` : '/trends'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Latest Jewelry Trends 2024 | Latest Fashion Jewellery" />
+        <meta name="twitter:description" content="Explore the hottest jewelry trends, seasonal inspirations, and influencer picks for 2024." />
+        <meta name="twitter:image" content="/images/placeholder.svg" />
+        <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/trends` : '/trends'} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: 'Latest Jewelry Trends 2024',
+            description: 'Stay ahead with the latest jewelry trends. Discover what\'s hot in fashion jewelry for 2024, from celebrity picks to seasonal must-haves.',
+            image: '/images/placeholder.svg',
+            url: typeof window !== 'undefined' ? `${window.location.origin}/trends` : '/trends',
+            publisher: { '@type': 'Organization', name: 'Latest Fashion Jewellery' },
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-cream-white via-soft-beige to-warm-ivory">

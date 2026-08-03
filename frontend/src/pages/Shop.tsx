@@ -18,6 +18,7 @@ import {
 import { useDebounce } from "@/hooks/useDebounce";
 import ProductGrid from "@/components/shop/ProductGrid";
 import { toast } from "sonner";
+import { hasMeaningfulSearchQuery, normalizeSearchQuery } from "@/lib/search";
 
 const Shop: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -39,7 +40,8 @@ const Shop: React.FC = () => {
     isError: isSearchError,
   } = useSearchProducts(debouncedSearchQuery);
 
-  const showSearchResults = debouncedSearchQuery.length >= 2;
+  const normalizedSearchQuery = normalizeSearchQuery(searchQuery);
+  const showSearchResults = hasMeaningfulSearchQuery(searchQuery);
 
   const handleViewCollections = () => {
     document
@@ -112,7 +114,7 @@ const Shop: React.FC = () => {
                 Discover Your Next Signature Piece
               </p>
 
-              <div className="max-w-2xl mx-auto mb-10">
+              <div className="max-w-2xl mx-auto mb-6">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <Input
@@ -133,6 +135,11 @@ const Shop: React.FC = () => {
                     </Button>
                   )}
                 </div>
+                <p className="mt-3 text-sm text-white/80">
+                  {searchQuery && !hasMeaningfulSearchQuery(searchQuery)
+                    ? "Use at least two characters to search by style or occasion."
+                    : "Search by metal, theme, or occasion for a more focused browse."}
+                </p>
               </div>
 
               <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
@@ -328,7 +335,7 @@ const Shop: React.FC = () => {
           <section id="search-results" className="py-16 bg-white">
             <div className="container mx-auto px-6">
               <h2 className="text-3xl md:text-4xl font-bold text-navy-800 mb-2 text-center">
-                Search Results for "{debouncedSearchQuery}"
+                Search Results for "{normalizedSearchQuery}"
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto text-center mb-10">
                 {isSearchError
@@ -339,6 +346,9 @@ const Shop: React.FC = () => {
                 isLoading={isLoadingSearch}
                 products={searchResults?.data}
                 onProductClick={handleProductClick}
+                emptyTitle={normalizedSearchQuery ? `No products match “${normalizedSearchQuery}”` : "No products found"}
+                emptyDescription={normalizedSearchQuery ? "Try a broader phrase or clear the search to browse the full collection." : "Try a broader search or browse another collection."}
+                onClearSearch={() => setSearchQuery("")}
               />
             </div>
           </section>

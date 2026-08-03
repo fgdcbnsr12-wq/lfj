@@ -79,13 +79,20 @@ class AffiliateProductController extends Controller
         $searchTerm = $validated['query'];
         $perPage = $validated['per_page'] ?? 12;
 
+        $searchTermLike = '%' . $searchTerm . '%';
+
         $products = AffiliateProduct::where('status', 'active')
-            // ✅ FIX: Use the correct column names from your database schema.
-            ->where(function ($query) use ($searchTerm) {
-                $query->where('product_name_snapshot', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('your_notes', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('item_type', 'like', '%' . $searchTerm . '%');
+            ->where(function ($query) use ($searchTermLike, $searchTerm) {
+                $query->where('product_name_snapshot', 'like', $searchTermLike)
+                    ->orWhere('your_notes', 'like', $searchTermLike)
+                    ->orWhere('item_type', 'like', $searchTermLike);
             })
+            ->orderByRaw("CASE
+                WHEN product_name_snapshot LIKE ? THEN 0
+                WHEN item_type LIKE ? THEN 1
+                WHEN your_notes LIKE ? THEN 2
+                ELSE 3
+            END", [$searchTermLike, $searchTermLike, $searchTermLike])
             ->orderBy('updated_at', 'desc')
             ->paginate($perPage);
 

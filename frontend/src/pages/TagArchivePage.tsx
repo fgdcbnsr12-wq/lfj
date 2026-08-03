@@ -7,12 +7,17 @@ import PostCardSkeleton from '@/components/blog/PostCardSkeleton';
 import SeoHead from '@/components/seo/SeoHead';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
 import { Button } from '@/components/ui/button';
+import { buildArchivePageStateDescription, buildCanonicalPath } from '@/lib/seo';
+import EmptyState from '@/components/ui/EmptyState';
 import { api } from '@/lib/apiClient';
 import { usePosts } from '@/hooks/usePosts';
-import { ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Search } from 'lucide-react';
 
 const TagArchivePage: React.FC = () => {
   const { tagSlug } = useParams<{ tagSlug: string }>();
+  const [searchParams] = useSearchParams();
+  const currentPage = parseInt(searchParams.get('page') || '1', 10);
   const { data: tag, isLoading, isError } = useQuery({
     queryKey: ['tag', tagSlug],
     queryFn: () => api.get(`/tags/${tagSlug}`),
@@ -47,16 +52,42 @@ const TagArchivePage: React.FC = () => {
     );
   }
 
+  const canonicalPath = buildCanonicalPath(`/tag/${tag.slug}`, currentPage);
   const crumbs = [
     { label: 'Home', href: '/' },
     { label: 'Blog', href: '/blog' },
     { label: 'Tags', href: '/tags' },
-    { label: tag.name, href: `/tag/${tag.slug}` },
+    { label: tag.name, href: canonicalPath },
   ];
+
+  const archiveSeo = {
+    ...tag.seo,
+    title: tag.seo?.title || `${tag.name} | Latest Fashion Jewellery`,
+    meta_description:
+      tag.seo?.meta_description ||
+      buildArchivePageStateDescription({
+        name: tag.name,
+        page: currentPage,
+        fallbackDescription: `Discover ${tag.name} stories, articles, and editorial content on Latest Fashion Jewellery.`,
+      }),
+    canonical: canonicalPath,
+    robots: 'index,follow',
+    schema: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: tag.name,
+      description: tag.description || `Explore ${tag.name} content and related articles.`,
+      url: canonicalPath,
+      mainEntity: {
+        '@type': 'ItemList',
+        name: tag.name,
+      },
+    },
+  };
 
   return (
     <BlogLayout>
-      <SeoHead seo={tag.seo} breadcrumbs={crumbs} />
+      <SeoHead seo={archiveSeo} breadcrumbs={crumbs} />
       <div className="container mx-auto px-4 py-12 md:py-16">
         <Breadcrumbs crumbs={crumbs} />
         <header className="text-center mb-12">
@@ -73,10 +104,12 @@ const TagArchivePage: React.FC = () => {
             {postsResponse.data.map((post) => <SimplifiedPostCard key={post.id} post={post} />)}
           </div>
         ) : (
-          <div className="text-center py-16 border border-dashed rounded-lg">
-            <h2 className="text-xl font-medium">No Posts Found</h2>
-            <p className="mt-1 text-sm text-gray-500">There are no posts with this tag yet.</p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No posts found"
+            description={`There are no posts with the “${tag.name}” tag yet. Try another tag or revisit later.`}
+            className="mt-4"
+          />
         )}
       </div>
     </BlogLayout>

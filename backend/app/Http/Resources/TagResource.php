@@ -15,7 +15,7 @@ class TagResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'posts_count' => $this->whenCounted('posts'),
-            'seo' => [], // Temporarily disabled: app(SeoService::class)->forTag($this->resource),
+            'seo' => app(SeoService::class)->forTag($this->resource),
         ];
     }
 }

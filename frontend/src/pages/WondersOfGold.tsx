@@ -77,41 +77,17 @@ const WondersOfGold: React.FC = () => {
           name="keywords"
           content="gold history, interactive timeline, gold technology, precious metals, digital museum, educational experience"
         />
-        <meta
-          property="og:title"
-          content="Wonders of Gold: An Interactive Journey Through Time"
-        />
-        <meta
-          property="og:description"
-          content="From neutron star collisions to quantum computing - discover gold's incredible story through an immersive digital experience."
-        />
-        <meta property="og:type" content="website" />
-        <meta
-          property="og:url"
-          content={
-            typeof window !== "undefined"
-              ? `${window.location.origin}/wonders-of-gold`
-              : "/wonders-of-gold"
-          }
-        />
+        <meta property="og:title" content="Wonders of Gold: An Interactive Journey Through Time" />
+        <meta property="og:description" content="From neutron star collisions to quantum computing - discover gold's incredible story through an immersive digital experience." />
+        <meta property="og:type" content="article" />
+        <meta property="og:image" content="/images/placeholder.svg" />
+        <meta property="og:url" content={typeof window !== "undefined" ? `${window.location.origin}/wonders-of-gold` : "/wonders-of-gold"} />
         <meta property="og:site_name" content="The Luster" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta
-          name="twitter:title"
-          content="Wonders of Gold: An Interactive Journey Through Time"
-        />
-        <meta
-          name="twitter:description"
-          content="From neutron star collisions to quantum computing - discover gold's incredible story through an immersive digital experience."
-        />
-        <link
-          rel="canonical"
-          href={
-            typeof window !== "undefined"
-              ? `${window.location.origin}/wonders-of-gold`
-              : "/wonders-of-gold"
-          }
-        />
+        <meta name="twitter:title" content="Wonders of Gold: An Interactive Journey Through Time" />
+        <meta name="twitter:description" content="From neutron star collisions to quantum computing - discover gold's incredible story through an immersive digital experience." />
+        <meta name="twitter:image" content="/images/placeholder.svg" />
+        <link rel="canonical" href={typeof window !== "undefined" ? `${window.location.origin}/wonders-of-gold` : "/wonders-of-gold"} />
 
         <script type="application/ld+json">
           {JSON.stringify({
@@ -120,6 +96,7 @@ const WondersOfGold: React.FC = () => {
             headline: "Wonders of Gold: An Interactive Journey Through Time",
             description:
               "Explore the fascinating history of gold from its cosmic origins to future applications. An immersive journey through mythology, empires, technology, and space exploration.",
+            image: "/images/placeholder.svg",
             author: {
               "@type": "Organization",
               name: "The Luster",
@@ -132,10 +109,7 @@ const WondersOfGold: React.FC = () => {
             dateModified: new Date().toISOString(),
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id":
-                typeof window !== "undefined"
-                  ? `${window.location.origin}/wonders-of-gold`
-                  : "/wonders-of-gold",
+              "@id": typeof window !== "undefined" ? `${window.location.origin}/wonders-of-gold` : "/wonders-of-gold",
             },
           })}
         </script>

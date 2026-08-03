@@ -93,7 +93,7 @@ const Landing: React.FC = () => {
           <div className="max-w-4xl mx-auto">
             <div className="mb-12">
               <h2 className="text-4xl md:text-5xl font-playfair font-bold text-luxury-gold mb-6">
-                Discover the Wonders of Gold
+              Discover the Wonders of Gold
               </h2>
               <p className="text-xl text-gray-300 leading-relaxed">
                 Embark on an extraordinary journey through time, from gold's

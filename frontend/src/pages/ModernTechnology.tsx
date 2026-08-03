@@ -24,7 +24,28 @@ const ModernTechnology: React.FC = () => {
         <meta property="og:title" content="Gold in Modern Technology: The Hidden Hero" />
         <meta property="og:description" content="From your smartphone to life-saving medical devices, discover how gold's unique properties make it indispensable in modern technology." />
         <meta property="og:type" content="article" />
+        <meta property="og:image" content="/images/placeholder.svg" />
+        <meta property="og:url" content={typeof window !== 'undefined' ? `${window.location.origin}/modern-technology` : '/modern-technology'} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Gold in Modern Technology | Electronics & Medical Applications | The Luster" />
+        <meta name="twitter:description" content="Discover how gold powers modern technology from smartphones to medical devices and aerospace systems." />
+        <meta name="twitter:image" content="/images/placeholder.svg" />
         <link rel="canonical" href={typeof window !== 'undefined' ? `${window.location.origin}/modern-technology` : '/modern-technology'} />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: 'Gold in Modern Technology',
+            description: 'Discover how gold powers modern technology from smartphones to medical devices. Explore gold\'s crucial role in electronics, aerospace, and life-saving medical applications.',
+            image: '/images/placeholder.svg',
+            author: { '@type': 'Organization', name: 'The Luster' },
+            publisher: { '@type': 'Organization', name: 'The Luster' },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': typeof window !== 'undefined' ? `${window.location.origin}/modern-technology` : '/modern-technology',
+            },
+          })}
+        </script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-blue-900 text-white overflow-hidden">

@@ -9,7 +9,7 @@ import SimplifiedPostCard from '@/components/blog/SimplifiedPostCard';
 import { Button } from "@/components/ui/button";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, PaginationEllipsis } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft as ArrowLeftIcon, Info as InfoIcon } from 'lucide-react';
+import { ArrowLeft as ArrowLeftIcon, Search } from 'lucide-react';
 
 // Services and Hooks - Assuming these are correctly set up now
 import { usePosts } from '@/hooks/usePosts';
@@ -17,6 +17,8 @@ import { useCategory } from '@/hooks/useCategories';
 import { GetPostsParams } from '@/services/postService';
 import SeoHead from '@/components/seo/SeoHead';
 import Breadcrumbs from '@/components/seo/Breadcrumbs';
+import { buildArchivePageStateDescription, buildCanonicalPath } from '@/lib/seo';
+import EmptyState from '@/components/ui/EmptyState';
 
 const CategoryArchivePage: React.FC = () => {
   const { categorySlug } = useParams<{ categorySlug: string }>();
@@ -74,15 +76,41 @@ const CategoryArchivePage: React.FC = () => {
     );
   }
 
+  const canonicalPath = buildCanonicalPath(`/category/${category.slug}`, currentPage);
+  const archiveSeo = {
+    ...category.seo,
+    title: category.seo?.title || `${category.name} | Latest Fashion Jewellery`,
+    meta_description:
+      category.seo?.meta_description ||
+      buildArchivePageStateDescription({
+        name: category.name,
+        page: currentPage,
+        fallbackDescription: `Browse ${category.name} articles and editorial content on Latest Fashion Jewellery.`,
+      }),
+    canonical: canonicalPath,
+    robots: 'index,follow',
+    schema: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: category.name,
+      description: category.description || `Explore ${category.name} posts and editorial content.`,
+      url: canonicalPath,
+      mainEntity: {
+        '@type': 'ItemList',
+        name: category.name,
+      },
+    },
+  };
+
   // Success state (category found, now render posts)
   return (
     <BlogLayout>
       <SeoHead
-        seo={category.seo}
+        seo={archiveSeo}
         breadcrumbs={[
           { label: 'Home', href: '/' },
           { label: 'Blog', href: '/blog' },
-          { label: category.name, href: `/category/${category.slug}` },
+          { label: category.name, href: canonicalPath },
         ]}
       />
       
@@ -91,7 +119,7 @@ const CategoryArchivePage: React.FC = () => {
             <Breadcrumbs crumbs={[
               { label: 'Home', href: '/' },
               { label: 'Blog', href: '/blog' },
-              { label: category.name, href: `/category/${category.slug}` },
+              { label: category.name, href: canonicalPath },
             ]} />
             <p className="text-sm font-semibold text-primary-gold uppercase tracking-wider mb-2">Category</p>
             <h1 className="text-4xl lg:text-5xl font-playfair font-bold text-dark-slate">{category.name}</h1>
@@ -135,11 +163,12 @@ const CategoryArchivePage: React.FC = () => {
             )}
           </>
         ) : (
-          <div className="text-center py-16 border border-dashed rounded-lg">
-            <InfoIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-xl font-medium">No Posts Found</h3>
-            <p className="mt-1 text-sm text-gray-500">There are no posts in the "{category.name}" category yet.</p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No posts found"
+            description={`There are no posts in the “${category.name}” category yet. Try another category or revisit later.`}
+            className="mt-4"
+          />
         )}
       </div>
     </BlogLayout>

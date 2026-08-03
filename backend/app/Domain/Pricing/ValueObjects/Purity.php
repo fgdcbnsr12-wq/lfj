@@ -25,6 +25,21 @@ final class Purity
         '375' => 37.5, // 9K gold
     ];
 
+    private const KARAT_LABELS = [
+        '24k' => 99.9,
+        '22k' => 91.7,
+        '21k' => 87.5,
+        '20k' => 83.3,
+        '18k' => 75.0,
+        '17k' => 70.8,
+        '16k' => 66.7,
+        '15k' => 62.5,
+        '14k' => 58.3,
+        '12k' => 50.0,
+        '10k' => 41.7,
+        '9k' => 37.5,
+    ];
+
     public function __construct(float $percentage, ?string $grade = null)
     {
         if ($percentage < 0 || $percentage > 100) {
@@ -37,11 +52,23 @@ final class Purity
 
     public static function fromGrade(string $grade): self
     {
-        if (! isset(self::COMMON_GRADES[$grade])) {
-            throw InvalidPurityException::unsupported($grade);
+        $normalized = strtolower(trim($grade));
+
+        if (isset(self::COMMON_GRADES[$normalized])) {
+            return new self(self::COMMON_GRADES[$normalized], $normalized);
         }
 
-        return new self(self::COMMON_GRADES[$grade], $grade);
+        if (isset(self::KARAT_LABELS[$normalized])) {
+            return new self(self::KARAT_LABELS[$normalized], $normalized);
+        }
+
+        if (preg_match('/^([0-9]{1,2})k$/i', $normalized, $matches) === 1) {
+            $percentage = (int) $matches[1] / 24 * 100;
+
+            return new self(round($percentage, 2), $normalized);
+        }
+
+        throw InvalidPurityException::unsupported($grade);
     }
 
     public function percentage(): float

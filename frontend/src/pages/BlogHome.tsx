@@ -11,6 +11,8 @@ import { useCategories } from "@/hooks/useCategories";
 import PostCard from "@/components/blog/PostCard";
 import PostCardSkeleton from "@/components/blog/PostCardSkeleton";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import EmptyState from "@/components/ui/EmptyState";
 import {
   Pagination,
   PaginationContent,
@@ -20,12 +22,13 @@ import {
   PaginationPrevious,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
-import { InfoIcon, RefreshCw } from "lucide-react";
+import { InfoIcon, RefreshCw, Search, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import SeoHead from "@/components/seo/SeoHead";
 import Breadcrumbs from "@/components/seo/Breadcrumbs";
 import { useSeo } from "@/hooks/useSeo";
+import { hasMeaningfulSearchQuery, normalizeSearchQuery } from "@/lib/search";
 
 const POSTS_PER_PAGE = 9;
 
@@ -58,6 +61,9 @@ const BlogHome: React.FC = () => {
   );
 
   const selectedCategorySlug = searchParams.get("category");
+  const searchQueryParam = searchParams.get("search") || "";
+  const normalizedSearchQuery = normalizeSearchQuery(searchQueryParam);
+  const hasActiveSearch = hasMeaningfulSearchQuery(searchQueryParam);
 
   // Categories
   const { data: categoriesResponse, isLoading: isLoadingCategories } =
@@ -75,6 +81,7 @@ const BlogHome: React.FC = () => {
     page: currentPage,
     perPage: POSTS_PER_PAGE,
     categorySlug: selectedCategorySlug,
+    search: hasActiveSearch ? normalizedSearchQuery : undefined,
   });
 
   // keep state in sync with URL (and scroll to top)
@@ -120,6 +127,15 @@ const BlogHome: React.FC = () => {
     setSearchParams(newParams, { replace: true });
   };
 
+  const handleSearchChange = (value: string) => {
+    const newParams = new URLSearchParams(searchParams);
+    if (value.trim()) newParams.set("search", value.trim());
+    else newParams.delete("search");
+    newParams.set("page", "1");
+    setCurrentPage(1);
+    setSearchParams(newParams, { replace: true });
+  };
+
   const selectedCategoryName = React.useMemo(
     () =>
       selectedCategorySlug
@@ -127,6 +143,8 @@ const BlogHome: React.FC = () => {
         : null,
     [categories, selectedCategorySlug]
   );
+
+  const hasActiveFilters = Boolean(selectedCategorySlug || searchQueryParam);
 
   // ---- pagination range (with ellipses) ----
   const range = (start: number, end: number) =>
@@ -263,6 +281,40 @@ const BlogHome: React.FC = () => {
           </p>
         </header>
 
+        <div className="mb-8 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <Input
+              value={searchQueryParam}
+              onChange={(event) => handleSearchChange(event.target.value)}
+              placeholder="Search stories, themes, or keywords"
+              className="h-12 rounded-full border-slate-200 pl-12 pr-12"
+            />
+            {searchQueryParam && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-3 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full"
+                onClick={() => handleSearchChange("")}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+            <p>
+              {searchQueryParam && !hasActiveSearch
+                ? "Use at least two characters to search by topic or keyword."
+                : "Search by title, theme, or keyword to surface the right stories faster."}
+            </p>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={() => handleSearchChange("")} className="px-0 text-primary-gold hover:bg-transparent hover:text-primary-gold/80">
+                Clear filters
+              </Button>
+            )}
+          </div>
+        </div>
+
         {/* Category Filters */}
         <ScrollArea className="w-full whitespace-nowrap rounded-md pb-4 mb-12">
           <div className="flex w-max space-x-2 md:justify-center md:w-full">
@@ -337,13 +389,22 @@ const BlogHome: React.FC = () => {
               <PostCard key={post.id} post={post} />
             ))
           ) : (
-            <div className="md:col-span-2 lg:col-span-3 text-center py-16 border border-dashed rounded-lg mt-8">
-              <InfoIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-              <h3 className="text-xl font-medium">No Posts Found</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                There are no posts in this category yet. Why not explore another
-                one?
-              </p>
+            <div className="md:col-span-2 lg:col-span-3 mt-8">
+              <EmptyState
+                icon={Search}
+                title={hasActiveSearch ? "No stories match your search" : "No stories found"}
+                description={
+                  hasActiveSearch
+                    ? `We couldn’t find posts matching “${searchQueryParam}” in this view. Try another keyword or clear the search.`
+                    : "There are no posts in this category yet. Why not explore another one?"
+                }
+                action={hasActiveSearch ? (
+                  <Button variant="outline" onClick={() => handleSearchChange("")}>
+                    <X className="mr-2 h-4 w-4" />
+                    Clear search
+                  </Button>
+                ) : undefined}
+              />
             </div>
           )}
         </div>

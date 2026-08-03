@@ -38,6 +38,8 @@ class ResaleCalculationDTO
             'original_price' => $this->originalPrice->amount(),
             'estimated_market_value' => $this->estimatedMarketValue->amount(),
             'buyback_amount' => $this->buybackAmount->amount(),
+            'buyback_price' => $this->buybackAmount->amount(),
+            'net_price' => $this->buybackAmount->amount(),
             'buyback_percentage' => $this->buybackPercentage,
             'condition' => $this->condition,
             'deductions' => $this->deductions,
